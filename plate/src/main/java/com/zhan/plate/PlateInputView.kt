@@ -22,6 +22,7 @@ import kotlinx.android.synthetic.main.layout_plate_input_view.view.*
  */
 class PlateInputView(
     val context: Context,
+    val spanCount: Int,
     val listener: (word: String) -> Unit
 ) : PopupWindow(context) {
 
@@ -82,13 +83,15 @@ class PlateInputView(
     }
 
     private fun initRecyclerView() {
+
+
         contentView.mRvContent.run {
-            layoutManager = GridLayoutManager(context, 7)
+            layoutManager = GridLayoutManager(context, spanCount)
             adapter = charAdapter
         }
 
         contentView.mRvProvince.run {
-            layoutManager = GridLayoutManager(context, 7)
+            layoutManager = GridLayoutManager(context, spanCount)
             adapter = provinceAdapter
         }
 
@@ -115,7 +118,7 @@ class PlateInputView(
             (0..3).forEach { _ -> add(PlateItem(PlateItem.EMPTY)) }
 
             letters.forEach {
-                if (it == "O" && !withLetterO)
+                if (isOChar(it) && !withLetterO)
                     return@forEach
                 add(PlateItem(PlateItem.CHAR, it))
             }
@@ -127,6 +130,8 @@ class PlateInputView(
             add(PlateItem(PlateItem.DELETE))
         }
     }
+
+    private fun isOChar(char: String) = char == "O"
 
     fun showProvince() {
         contentView.mRvProvince.visible()

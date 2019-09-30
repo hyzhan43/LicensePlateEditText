@@ -10,8 +10,10 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.setMargins
+import com.zhan.ktwing.ext.dp2px
 import com.zhan.ktwing.ext.getDrawableRef
 import com.zhan.ktwing.ext.sp2px
+import com.zhan.plate.bean.CharItem
 import com.zhan.plate.ext.isNewEnergyPlate
 import com.zhan.plate.ext.isPlate
 import com.zhan.plate.state.PlateManager
@@ -63,7 +65,6 @@ class PlateView @JvmOverloads constructor(
             initPlate(value)
         }
 
-
     init {
         LayoutInflater.from(context).inflate(R.layout.layout_plate_view, this)
 
@@ -104,7 +105,6 @@ class PlateView @JvmOverloads constructor(
         (0..total).forEach { index ->
             val plateText = generateCharText(index, lp)
             plateTextList.add(plateText)
-            // 添加到 LinearLayout 中去。
             mLlContent.addView(plateText)
         }
 
@@ -167,7 +167,11 @@ class PlateView @JvmOverloads constructor(
     }
 
     private fun initPlateInputView() {
-        mPlateInputView = PlateInputView(context) { word ->
+
+        val width = resources.displayMetrics.widthPixels
+        val spanCount = width / 50.dp2px
+
+        mPlateInputView = PlateInputView(context, spanCount) { word ->
 
             // 点击删除按钮
             if (isDeleteButton(word)) {

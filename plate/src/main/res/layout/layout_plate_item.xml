@@ -2,13 +2,13 @@
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mCvContainer"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_margin="4dp"
     app:cardCornerRadius="6dp"
-    app:cardElevation="6dp"
-    app:contentPadding="4dp"
-    android:id="@+id/mCvContainer">
+    app:cardElevation="2dp"
+    app:contentPadding="4dp">
 
     <TextView
         android:id="@+id/mTvWord"
