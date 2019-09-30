@@ -171,25 +171,23 @@ class PlateView @JvmOverloads constructor(
 
             // 点击删除按钮
             if (isDeleteButton(word)) {
-                plateTextList[currentIndex].text = defText
-                plateCharBack()
+                plateCharBack(plateTextList[currentIndex])
                 return@PlateInputView
             }
 
-            plateTextList[currentIndex].text = word
-            plateCharForward()
+            plateCharForward(plateTextList[currentIndex], word)
         }
     }
 
     private fun isDeleteButton(word: String): Boolean = word == PlateInputView.DELETE
 
-    private fun plateCharForward() {
+    private fun plateCharForward(textView: TextView, content: String) {
 
         if (isFirstChar()) {
             mPlateInputView.showPlateChar()
         }
 
-        resetTextViewStyle(plateTextList[currentIndex])
+        resetTextViewStyleAndText(textView, content)
 
         if (plateManager.isLastTextView(currentIndex)) {
             mPlateInputView.dismiss()
@@ -197,27 +195,32 @@ class PlateView @JvmOverloads constructor(
         }
 
         currentIndex++
-
         setTextViewFocusStyle(plateTextList[currentIndex])
     }
 
     private fun isFirstChar() = currentIndex == 0
 
-    private fun plateCharBack() {
-
+    private fun plateCharBack(textView: TextView) {
         if (isSecondChar()) {
             mPlateInputView.showProvince()
         }
 
-        resetTextViewStyle(plateTextList[currentIndex])
+        resetTextViewStyleAndText(textView, defText)
 
-        if (currentIndex - 1 < 0) {
+        if (isZeroChar()) {
             return
         }
 
         currentIndex--
         setTextViewFocusStyle(plateTextList[currentIndex])
     }
+
+    private fun resetTextViewStyleAndText(textView: TextView, content: String) {
+        textView.text = content
+        resetTextViewStyle(textView)
+    }
+
+    private fun isZeroChar() = currentIndex - 1 < 0
 
     private fun isSecondChar() = currentIndex == 1
 
