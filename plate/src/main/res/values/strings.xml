@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Plate</string>
+    <string name="change_to_normal_plate">切换为7位普通蓝牌车</string>
+    <string name="change_to_new_plate">切换为8位新能源绿牌车</string>
+</resources>
