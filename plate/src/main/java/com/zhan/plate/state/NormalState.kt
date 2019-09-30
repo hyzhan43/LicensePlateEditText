@@ -22,5 +22,7 @@ class NormalState : PlateState {
         return current + 1 >= 7
     }
 
-    override fun getPlate(plateList: List<TextView>): String = plateList.joinToString(separator = "", limit = 7, truncated = "") { it.text }
+    override fun getPlate(plateList: List<TextView>): String {
+        return plateList.joinToString(separator = "", limit = 7, truncated = "") { it.text }
+    }
 }

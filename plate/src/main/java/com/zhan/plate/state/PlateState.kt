@@ -15,6 +15,9 @@ interface PlateState {
      */
     fun displayPlateBox(plateView: PlateView, textView: TextView)
 
+    /**
+     *  是否是最后一个 TextView
+     */
     fun isLastTextView(current: Int): Boolean
 
     /**

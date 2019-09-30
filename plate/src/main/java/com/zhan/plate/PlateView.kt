@@ -6,14 +6,16 @@ import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.zhan.plate.state.PlateManager
+import androidx.core.view.setMargins
 import com.zhan.ktwing.ext.getDrawableRef
 import com.zhan.ktwing.ext.sp2px
+import com.zhan.plate.ext.isNewEnergyPlate
 import com.zhan.plate.ext.isPlate
+import com.zhan.plate.state.PlateManager
 import kotlinx.android.synthetic.main.layout_plate_view.view.*
-import java.util.*
 
 /**
  *  @author:  hyzhan
@@ -30,9 +32,15 @@ class PlateView @JvmOverloads constructor(
     private val defText = "-"
     // 默认字体大小
     private val defTextSize = 16f.sp2px
+    private val textSize: Float
+
     // 默认字体颜色
-    private val normalColor = Color.BLACK
-    private var focusColor = Color.WHITE
+    private val normalColor: Int
+    private var focusColor: Int
+
+    // 4px
+    private val defaultMargin = 4
+    private val marginSize: Int
 
     private val defTextNormalBg = getDrawableRef(R.drawable.rect_stroke_primary)
     private val defTextFocusBg = getDrawableRef(R.drawable.rect_solid_primary)
@@ -48,9 +56,32 @@ class PlateView @JvmOverloads constructor(
 
     private val total = 7
 
+    var plate: String = ""
+        get() = plateManager.getPlate()
+        set(value) {
+            field = value
+            initPlate(value)
+        }
+
+
     init {
         LayoutInflater.from(context).inflate(R.layout.layout_plate_view, this)
 
+        context.obtainStyledAttributes(attrs, R.styleable.PlateView, defStyle, 0).run {
+
+            marginSize = getDimensionPixelSize(R.styleable.PlateView_marginSize, defaultMargin)
+
+            textSize = getDimension(R.styleable.PlateView_textSize, defTextSize)
+            focusColor = getColor(R.styleable.PlateView_focusColor, Color.WHITE)
+            normalColor = getColor(R.styleable.PlateView_normalColor, Color.BLACK)
+
+            recycle()
+        }
+
+        initView()
+    }
+
+    private fun initView() {
         initEachPlateChar()
 
         plateManager.displayPlateBox()
@@ -68,8 +99,10 @@ class PlateView @JvmOverloads constructor(
      */
     private fun initEachPlateChar() {
 
+        val lp = LayoutParams(0, LayoutParams.WRAP_CONTENT, 1.0f).apply { setMargins(marginSize) }
+
         (0..total).forEach { index ->
-            val plateText = generateCharText(index)
+            val plateText = generateCharText(index, lp)
             plateTextList.add(plateText)
             // 添加到 LinearLayout 中去。
             mLlContent.addView(plateText)
@@ -79,6 +112,7 @@ class PlateView @JvmOverloads constructor(
     }
 
     private fun showPlateInputView() {
+        mPlateInputView.showAtLocation(this, Gravity.BOTTOM, 0, 0)
         when (currentIndex) {
             0 -> mPlateInputView.showProvince()
             else -> mPlateInputView.showPlateChar()
@@ -87,24 +121,33 @@ class PlateView @JvmOverloads constructor(
 
     private fun changeStyle() {
         plateTextList.forEachIndexed { index, textView ->
-            if (index == currentIndex) {
-                // 设置选中样式
-                textView.run {
-                    background = defTextFocusBg
-                    setTextColor(focusColor)
-                }
+            if (isFocus(index)) {
+                setTextViewFocusStyle(textView)
             } else {
-                // 设置选中样式
-                textView.run {
-                    setTextColor(normalColor)
-                    background = defTextNormalBg
-                }
+                resetTextViewStyle(textView)
             }
         }
     }
 
-    private fun generateCharText(index: Int): TextView {
-        val lp = LayoutParams(0, LayoutParams.WRAP_CONTENT, 1.0f)
+    /**
+     * 设置textView选中样式
+     */
+    private fun setTextViewFocusStyle(textView: TextView) {
+        textView.background = defTextFocusBg
+        textView.setTextColor(focusColor)
+    }
+
+    /**
+     *  重置textView 样式
+     */
+    private fun resetTextViewStyle(textView: TextView) {
+        textView.setTextColor(normalColor)
+        textView.background = defTextNormalBg
+    }
+
+    private fun isFocus(index: Int) = index == currentIndex
+
+    private fun generateCharText(index: Int, lp: LayoutParams): TextView {
         return TextView(context).apply {
             text = defText
             setTextSize(TypedValue.COMPLEX_UNIT_PX, defTextSize)
@@ -113,46 +156,40 @@ class PlateView @JvmOverloads constructor(
             layoutParams = lp
             background = defTextNormalBg
             tag = index
-            setOnClickListener {
-                currentIndex = it.tag as Int
-
-                showPlateInputView()
-                changeStyle()
-
-                mPlateInputView.showAtLocation(
-                    this,
-                    Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL,
-                    0,
-                    0
-                )
-            }
+            setOnClickListener { showInputView(it) }
         }
+    }
+
+    private fun showInputView(it: View) {
+        currentIndex = it.tag as Int
+        showPlateInputView()
+        changeStyle()
     }
 
     private fun initPlateInputView() {
         mPlateInputView = PlateInputView(context) { word ->
 
             // 点击删除按钮
-            if (word == PlateInputView.DELETE) {
+            if (isDeleteButton(word)) {
                 plateTextList[currentIndex].text = defText
                 plateCharBack()
                 return@PlateInputView
             }
+
             plateTextList[currentIndex].text = word
             plateCharForward()
         }
     }
 
+    private fun isDeleteButton(word: String): Boolean = word == PlateInputView.DELETE
+
     private fun plateCharForward() {
 
-        if (currentIndex == 0) {
+        if (isFirstChar()) {
             mPlateInputView.showPlateChar()
         }
 
-        plateTextList[currentIndex].run {
-            setTextColor(normalColor)
-            background = defTextNormalBg
-        }
+        resetTextViewStyle(plateTextList[currentIndex])
 
         if (plateManager.isLastTextView(currentIndex)) {
             mPlateInputView.dismiss()
@@ -161,53 +198,39 @@ class PlateView @JvmOverloads constructor(
 
         currentIndex++
 
-        plateTextList[currentIndex].run {
-            setTextColor(focusColor)
-            background = defTextFocusBg
-        }
+        setTextViewFocusStyle(plateTextList[currentIndex])
     }
+
+    private fun isFirstChar() = currentIndex == 0
 
     private fun plateCharBack() {
 
-        if (currentIndex == 1) {
+        if (isSecondChar()) {
             mPlateInputView.showProvince()
         }
 
-        plateTextList[currentIndex].run {
-            setTextColor(normalColor)
-            background = defTextNormalBg
-        }
+        resetTextViewStyle(plateTextList[currentIndex])
 
         if (currentIndex - 1 < 0) {
             return
         }
 
         currentIndex--
-
-        plateTextList[currentIndex].run {
-            setTextColor(focusColor)
-            background = defTextFocusBg
-        }
+        setTextViewFocusStyle(plateTextList[currentIndex])
     }
 
-    fun getPlate(): String = plateManager.getPlate()
+    private fun isSecondChar() = currentIndex == 1
 
     /**
      *  设置车牌
      */
-    fun setPlate(plate: String) {
-        if (plate.isEmpty() || !plate.isPlate()) {
-            return
-        }
+    private fun initPlate(plate: String) {
+        require(!(plate.isEmpty() || !plate.isPlate())) { "please input right plate" }
 
-        val length = plate.length - 1
-        for (index in 0..length) {
-            plateTextList[index].text = plate[index].toString().toUpperCase(Locale.CHINA)
-        }
-
-        if (length != 6) {
+        if (plate.isNewEnergyPlate()) {
             plateManager.switchPlateState()
-            plateManager.displayPlateBox()
         }
+
+        plateManager.setupPlate(plate)
     }
 }

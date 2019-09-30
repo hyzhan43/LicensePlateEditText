@@ -7,4 +7,8 @@ import android.widget.TextView
  *  @date:    2019/7/22
  *  @desc:    TODO
  */
-data class CharItem(val pre: TextView? = null, val current: TextView, val next: TextView? = null)
+data class CharItem(
+    val pre: TextView? = null,
+    val current: TextView,
+    val next: TextView? = null
+)

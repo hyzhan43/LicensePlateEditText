@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="PlateView">
+        <attr name="marginSize" format="dimension"/>
+
+        <attr name="focusColor" format="color"/>
+        <attr name="normalColor" format="color"/>
+
+        <attr name="textSize" format="dimension"/>
+    </declare-styleable>
+</resources>
