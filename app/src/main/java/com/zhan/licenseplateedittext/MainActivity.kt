@@ -11,6 +11,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         mPlateView.plate = "粤A11111"
-        mPlateView.triggerView = mTvHint
+        mPlateView.setTriggerView(mTvHint)
     }
 }

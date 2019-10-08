@@ -76,12 +76,6 @@ class PlateView @JvmOverloads constructor(
             initPlate(value)
         }
 
-    var triggerView: View? = null
-        set(value) {
-            field = value
-            setupChangeView(value)
-        }
-
     init {
         LayoutInflater.from(context).inflate(R.layout.layout_plate_view, this)
 
@@ -275,8 +269,8 @@ class PlateView @JvmOverloads constructor(
         plateManager.setupPlate(plate)
     }
 
-    private fun setupChangeView(view: View?) {
-        view?.setOnClickListener {
+    fun setTriggerView(view: View) {
+        view.setOnClickListener {
             plateManager.switchPlateState()
             plateManager.displayPlateBox()
         }
