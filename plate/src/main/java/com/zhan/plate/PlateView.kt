@@ -2,6 +2,7 @@ package com.zhan.plate
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.Gravity
@@ -13,7 +14,7 @@ import androidx.core.view.setMargins
 import com.zhan.ktwing.ext.dp2px
 import com.zhan.ktwing.ext.getDrawableRef
 import com.zhan.ktwing.ext.sp2px
-import com.zhan.plate.bean.CharItem
+import com.zhan.plate.enums.BackgroundStyleEnum
 import com.zhan.plate.ext.isNewEnergyPlate
 import com.zhan.plate.ext.isPlate
 import com.zhan.plate.state.PlateManager
@@ -36,16 +37,26 @@ class PlateView @JvmOverloads constructor(
     private val defTextSize = 16f.sp2px
     private val textSize: Float
 
-    // 默认字体颜色
+    // 默认统一颜色
     private val normalColor: Int
-    private var focusColor: Int
+    private val focusColor: Int
+
+    // 默认字体颜色
+    private val normalTextColor: Int
+    private val focusTextColor: Int
+
+    private val backgroundStyle: Int
+
+    // 默认背景颜色
+    private val normalBgColor: Int
+    private val focusBgColor: Int
 
     // 4px
     private val defaultMargin = 4
     private val marginSize: Int
 
-    private val defTextNormalBg = getDrawableRef(R.drawable.rect_stroke_primary)
-    private val defTextFocusBg = getDrawableRef(R.drawable.rect_solid_primary)
+    private val defTextNormalBg = getDrawableRef(R.drawable.shape_radius4_bg)
+    private val defTextFocusBg = getDrawableRef(R.drawable.shape_radius4_bg)
 
     private var plateTextList = arrayListOf<TextView>()
 
@@ -65,6 +76,12 @@ class PlateView @JvmOverloads constructor(
             initPlate(value)
         }
 
+    var triggerView: View? = null
+        set(value) {
+            field = value
+            setupChangeView(value)
+        }
+
     init {
         LayoutInflater.from(context).inflate(R.layout.layout_plate_view, this)
 
@@ -73,8 +90,18 @@ class PlateView @JvmOverloads constructor(
             marginSize = getDimensionPixelSize(R.styleable.PlateView_marginSize, defaultMargin)
 
             textSize = getDimension(R.styleable.PlateView_textSize, defTextSize)
-            focusColor = getColor(R.styleable.PlateView_focusColor, Color.WHITE)
+
+            backgroundStyle =
+                getInt(R.styleable.PlateView_backgroundStyle, BackgroundStyleEnum.STROKE.code)
+
+            focusColor = getColor(R.styleable.PlateView_focusColor, Color.BLACK)
             normalColor = getColor(R.styleable.PlateView_normalColor, Color.BLACK)
+
+            focusTextColor = getColor(R.styleable.PlateView_focusTextColor, focusColor)
+            normalTextColor = getColor(R.styleable.PlateView_normalTextColor, normalColor)
+
+            focusBgColor = getColor(R.styleable.PlateView_focusBgColor, focusColor)
+            normalBgColor = getColor(R.styleable.PlateView_normalBgColor, normalColor)
 
             recycle()
         }
@@ -83,22 +110,19 @@ class PlateView @JvmOverloads constructor(
     }
 
     private fun initView() {
-        initEachPlateChar()
+        initPlateChar()
 
         plateManager.displayPlateBox()
 
         initPlateInputView()
-
-        mTvHint.setOnClickListener {
-            plateManager.switchPlateState()
-            plateManager.displayPlateBox()
-        }
     }
 
     /**
      *  动态生成 车牌号码每一个 TextView
      */
-    private fun initEachPlateChar() {
+    private fun initPlateChar() {
+
+        initBackgroundStyle()
 
         val lp = LayoutParams(0, LayoutParams.WRAP_CONTENT, 1.0f).apply { setMargins(marginSize) }
 
@@ -108,7 +132,17 @@ class PlateView @JvmOverloads constructor(
             mLlContent.addView(plateText)
         }
 
-        plateManager = PlateManager(this, plateTextList)
+        plateManager = PlateManager(plateTextList)
+    }
+
+    private fun initBackgroundStyle() {
+        if (backgroundStyle == BackgroundStyleEnum.STROKE.code) {
+            (defTextNormalBg as GradientDrawable).setStroke(1, normalBgColor)
+            (defTextFocusBg as GradientDrawable).setStroke(1, focusBgColor)
+        } else {
+            (defTextNormalBg as GradientDrawable).setColor(normalBgColor)
+            (defTextFocusBg as GradientDrawable).setColor(focusBgColor)
+        }
     }
 
     private fun showPlateInputView() {
@@ -134,14 +168,14 @@ class PlateView @JvmOverloads constructor(
      */
     private fun setTextViewFocusStyle(textView: TextView) {
         textView.background = defTextFocusBg
-        textView.setTextColor(focusColor)
+        textView.setTextColor(focusTextColor)
     }
 
     /**
      *  重置textView 样式
      */
     private fun resetTextViewStyle(textView: TextView) {
-        textView.setTextColor(normalColor)
+        textView.setTextColor(normalTextColor)
         textView.background = defTextNormalBg
     }
 
@@ -151,7 +185,7 @@ class PlateView @JvmOverloads constructor(
         return TextView(context).apply {
             text = defText
             setTextSize(TypedValue.COMPLEX_UNIT_PX, defTextSize)
-            setTextColor(normalColor)
+            setTextColor(normalTextColor)
             gravity = Gravity.CENTER
             layoutParams = lp
             background = defTextNormalBg
@@ -239,5 +273,12 @@ class PlateView @JvmOverloads constructor(
         }
 
         plateManager.setupPlate(plate)
+    }
+
+    private fun setupChangeView(view: View?) {
+        view?.setOnClickListener {
+            plateManager.switchPlateState()
+            plateManager.displayPlateBox()
+        }
     }
 }

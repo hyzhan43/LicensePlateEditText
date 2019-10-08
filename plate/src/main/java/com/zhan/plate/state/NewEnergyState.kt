@@ -13,8 +13,7 @@ import kotlinx.android.synthetic.main.layout_plate_view.view.*
  */
 class NewEnergyState : PlateState {
 
-    override fun displayPlateBox(plateView: PlateView, textView: TextView) {
-        plateView.mTvHint.text = plateView.context.getString(R.string.change_to_normal_plate)
+    override fun displayPlateBox(textView: TextView) {
         textView.visible()
     }
 

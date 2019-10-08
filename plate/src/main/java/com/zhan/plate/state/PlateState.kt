@@ -11,9 +11,9 @@ import com.zhan.plate.PlateView
 interface PlateState {
 
     /**
-     *  显示车牌框
+     *  显示最后一个输入框
      */
-    fun displayPlateBox(plateView: PlateView, textView: TextView)
+    fun displayPlateBox(textView: TextView)
 
     /**
      *  是否是最后一个 TextView

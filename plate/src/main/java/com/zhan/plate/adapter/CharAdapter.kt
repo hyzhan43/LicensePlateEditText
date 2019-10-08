@@ -25,19 +25,25 @@ class CharAdapter : BaseMultiItemQuickAdapter<PlateItem, BaseViewHolder>(null) {
 
         helper?.run {
             when (itemViewType) {
-                PlateItem.CHAR -> {
-                    setText(R.id.mTvWord, item?.data ?: "")
-                    addOnClickListener(R.id.mTvWord)
-                }
-                PlateItem.EMPTY -> {
-                    itemView.mCvContainer.gone()
-                }
-                PlateItem.DELETE -> {
-                    addOnClickListener(R.id.mIvDelete)
-                }
+                PlateItem.CHAR -> convertChar(item)
+                PlateItem.EMPTY -> convertEmpty()
+                PlateItem.DELETE -> convertDelete()
                 else -> {
                 }
             }
         }
+    }
+
+    private fun BaseViewHolder.convertDelete() {
+        addOnClickListener(R.id.mIvDelete)
+    }
+
+    private fun BaseViewHolder.convertEmpty() {
+        itemView.mCvContainer.gone()
+    }
+
+    private fun BaseViewHolder.convertChar(item: PlateItem?) {
+        setText(R.id.mTvWord, item?.data ?: "")
+        addOnClickListener(R.id.mTvWord)
     }
 }

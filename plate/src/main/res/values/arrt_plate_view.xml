@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <declare-styleable name="PlateView">
-        <attr name="marginSize" format="dimension"/>
+        <attr name="marginSize" format="dimension" />
 
-        <attr name="focusColor" format="color"/>
-        <attr name="normalColor" format="color"/>
+        <attr name="focusColor" format="color" />
+        <attr name="normalColor" format="color" />
 
-        <attr name="textSize" format="dimension"/>
+        <attr name="focusTextColor" format="color" />
+        <attr name="normalTextColor" format="color" />
+
+        <attr name="backgroundStyle" format="enum">
+            <enum name="stroke" value="0" />
+            <enum name="fill" value="1" />
+        </attr>
+        <attr name="focusBgColor" format="color" />
+        <attr name="normalBgColor" format="color" />
+
+        <attr name="borderWidth" format="dimension"/>
+
+        <attr name="textSize" format="dimension" />
     </declare-styleable>
 </resources>

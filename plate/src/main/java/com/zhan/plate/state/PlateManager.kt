@@ -9,7 +9,7 @@ import java.util.*
  *  @date:    2019/7/23
  *  @desc:    plateView 管理类
  */
-class PlateManager(private val plateView: PlateView, private val charTextViews: List<TextView>) {
+class PlateManager(private val charTextViews: List<TextView>) {
 
     // 默认状态
     var state: PlateState = NormalState()
@@ -27,7 +27,7 @@ class PlateManager(private val plateView: PlateView, private val charTextViews: 
 
 
     fun displayPlateBox() {
-        state.displayPlateBox(plateView, charTextViews[7])
+        state.displayPlateBox(charTextViews[7])
     }
 
     fun isLastTextView(current: Int): Boolean {
