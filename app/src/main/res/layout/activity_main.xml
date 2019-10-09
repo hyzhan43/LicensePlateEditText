@@ -11,10 +11,7 @@
         android:id="@+id/mPlateView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp"
-        app:backgroundStyle="fill"
-        app:focusBgColor="@color/colorPrimaryDark"
-        app:normalBgColor="@color/colorAccent" />
+        android:padding="10dp" />
 
     <TextView
         android:id="@+id/mTvHint"
