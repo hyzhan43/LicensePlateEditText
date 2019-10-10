@@ -177,6 +177,7 @@ class PlateView @JvmOverloads constructor(
 
     private fun generateCharText(index: Int, lp: LayoutParams): TextView {
         return TextView(context).apply {
+            paint.isFakeBoldText = true
             text = defText
             setTextSize(TypedValue.COMPLEX_UNIT_PX, defTextSize)
             setTextColor(normalTextColor)
@@ -196,10 +197,7 @@ class PlateView @JvmOverloads constructor(
 
     private fun initPlateInputView() {
 
-        val width = resources.displayMetrics.widthPixels
-        val spanCount = width / 50.dp2px
-
-        mPlateInputView = PlateInputView(context, spanCount) { word ->
+        mPlateInputView = PlateInputView(context) { word ->
 
             // 点击删除按钮
             if (isDeleteButton(word)) {

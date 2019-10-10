@@ -5,16 +5,17 @@
     android:id="@+id/mCvContainer"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_margin="4dp"
+    android:layout_margin="2dp"
     app:cardCornerRadius="6dp"
-    app:cardElevation="2dp"
-    app:contentPadding="4dp">
+    app:cardElevation="2dp">
 
     <TextView
         android:id="@+id/mTvWord"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
         android:gravity="center"
+        android:minWidth="40dp"
+        android:padding="4dp"
         android:textColor="@android:color/black"
         android:textSize="20sp"
         tools:text="粤" />

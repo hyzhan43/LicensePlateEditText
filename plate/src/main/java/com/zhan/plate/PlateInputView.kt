@@ -3,6 +3,7 @@ package com.zhan.plate
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.WindowManager
 import android.widget.PopupWindow
@@ -21,8 +22,7 @@ import kotlinx.android.synthetic.main.layout_plate_input_view.view.*
  *  @desc:    TODO
  */
 class PlateInputView(
-    val context: Context,
-    val spanCount: Int,
+    private val context: Context,
     val listener: (word: String) -> Unit
 ) : PopupWindow(context) {
 
@@ -31,16 +31,23 @@ class PlateInputView(
     }
 
     private val charAdapter by lazy { CharAdapter() }
-    private val provinceAdapter by lazy { ProvinceAdapter() }
+    private val provinceAdapter by lazy { CharAdapter() }
 
     private val chinese = arrayOf("港", "澳", "学", "领")
     private val num = arrayOf("0", "1", "2", "3", "4", "5", "6", "7", "8", "9")
+    //    private val letters = arrayOf(
+//        "A", "B", "C", "D", "E",
+//        "F", "G", "H", "J", "K",
+//        "L", "M", "N", "O", "P",
+//        "Q", "R", "S", "T", "U",
+//        "V", "W", "X", "Y", "Z"
+//    )
     private val letters = arrayOf(
-        "A", "B", "C", "D", "E",
-        "F", "G", "H", "J", "K",
-        "L", "M", "N", "O", "P",
-        "Q", "R", "S", "T", "U",
-        "V", "W", "X", "Y", "Z"
+        "Q", "W", "E", "R", "T",
+        "Y", "U", "I", "O", "P",
+        "A", "S", "D", "F", "G",
+        "H", "J", "K", "L", "Z",
+        "X", "C", "V", "B", "N", "M"
     )
 
     private val provinces = arrayOf(
@@ -54,14 +61,12 @@ class PlateInputView(
     )
 
     private val charItems by lazy { initCharItemData() }
-
-    private var withLetterO = true
-    private var withChinese = true
+    private val provinceItems by lazy { initProvinceItemData() }
 
     init {
         initPlateView()
-        initRecyclerView()
         initData()
+        initRecyclerView()
     }
 
     private fun initPlateView() {
@@ -86,12 +91,17 @@ class PlateInputView(
 
 
         contentView.mRvContent.run {
-            layoutManager = GridLayoutManager(context, spanCount)
             adapter = charAdapter
+            layoutManager = GridLayoutManager(context, 10).apply {
+                spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+                    override fun getSpanSize(position: Int): Int = getSpanCount(position)
+                }
+            }
+
         }
 
         contentView.mRvProvince.run {
-            layoutManager = GridLayoutManager(context, spanCount)
+            layoutManager = GridLayoutManager(context, 10)
             adapter = provinceAdapter
         }
 
@@ -103,35 +113,47 @@ class PlateInputView(
         }
 
         provinceAdapter.setOnItemChildClickListener { _, _, position ->
-            listener(provinceAdapter.data[position])
+            listener(provinceAdapter.data[position].data)
+        }
+    }
+
+    private fun getSpanCount(position: Int): Int {
+        val type = charAdapter.getItemViewType(position)
+        return if (type == PlateItem.DELETE) {
+            return 2
+        } else {
+            1
         }
     }
 
     private fun initData() {
-        provinceAdapter.setNewData(provinces.asList())
+        provinceAdapter.setNewData(provinceItems)
         charAdapter.setNewData(charItems)
     }
 
     private fun initCharItemData(): ArrayList<PlateItem> {
         return ArrayList<PlateItem>().apply {
             num.forEach { add(PlateItem(PlateItem.CHAR, it)) }
+
+            letters.forEach { add(PlateItem(PlateItem.CHAR, it)) }
+
             (0..3).forEach { _ -> add(PlateItem(PlateItem.EMPTY)) }
-
-            letters.forEach {
-                if (isOChar(it) && !withLetterO)
-                    return@forEach
-                add(PlateItem(PlateItem.CHAR, it))
-            }
-
-            (0..2).forEach { _ -> add(PlateItem(PlateItem.EMPTY)) }
             chinese.forEach { add(PlateItem(PlateItem.CHAR, it)) }
-            add(PlateItem(PlateItem.EMPTY))
-            add(PlateItem(PlateItem.EMPTY))
+            (0..3).forEach { _ -> add(PlateItem(PlateItem.EMPTY)) }
             add(PlateItem(PlateItem.DELETE))
         }
     }
 
-    private fun isOChar(char: String) = char == "O"
+    private fun initProvinceItemData(): ArrayList<PlateItem> {
+        return ArrayList<PlateItem>().apply {
+            (0..9).forEach { add(PlateItem(PlateItem.CHAR, provinces[it])) }
+            add(PlateItem(PlateItem.EMPTY))
+            (11..18).forEach { add(PlateItem(PlateItem.CHAR, provinces[it])) }
+            add(PlateItem(PlateItem.EMPTY))
+            add(PlateItem(PlateItem.EMPTY))
+            (23..30).forEach { add(PlateItem(PlateItem.CHAR, provinces[it])) }
+        }
+    }
 
     fun showProvince() {
         contentView.mRvProvince.visible()
