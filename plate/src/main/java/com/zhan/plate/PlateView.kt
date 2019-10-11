@@ -3,6 +3,8 @@ package com.zhan.plate
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
+import android.inputmethodservice.Keyboard
+import android.inputmethodservice.KeyboardView
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.Gravity
@@ -11,14 +13,17 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.setMargins
-import com.zhan.ktwing.ext.dp2px
 import com.zhan.ktwing.ext.getDrawableRef
+import com.zhan.ktwing.ext.gone
 import com.zhan.ktwing.ext.sp2px
+import com.zhan.ktwing.ext.visible
 import com.zhan.plate.enums.BackgroundStyleEnum
 import com.zhan.plate.ext.isNewEnergyPlate
 import com.zhan.plate.ext.isPlate
 import com.zhan.plate.state.PlateManager
 import kotlinx.android.synthetic.main.layout_plate_view.view.*
+import kotlinx.android.synthetic.main.layout_plate_view.view.mKvNumberLetters
+import kotlinx.android.synthetic.main.layout_plate_view.view.mKvProvinces
 
 /**
  *  @author:  hyzhan
@@ -26,10 +31,10 @@ import kotlinx.android.synthetic.main.layout_plate_view.view.*
  *  @desc:    TODO
  */
 class PlateView @JvmOverloads constructor(
-    context: Context,
+    val mContext: Context,
     attrs: AttributeSet? = null,
     defStyle: Int = 0
-) : LinearLayout(context, attrs, defStyle) {
+) : LinearLayout(mContext, attrs, defStyle) {
 
     // 默认显示文本
     private val defText = "-"
@@ -76,10 +81,36 @@ class PlateView @JvmOverloads constructor(
             initPlate(value)
         }
 
-    init {
-        LayoutInflater.from(context).inflate(R.layout.layout_plate_view, this)
+    private val keyboardListener = object : KeyboardView.OnKeyboardActionListener {
+        override fun swipeUp() {}
+        override fun swipeRight() {}
+        override fun swipeLeft() {}
+        override fun swipeDown() {}
+        override fun onText(text: CharSequence) {}
+        override fun onRelease(primaryCode: Int) {}
+        override fun onPress(primaryCode: Int) {}
+        override fun onKey(primaryCode: Int, keyCodes: IntArray) {
+//            val editable = mEdit.text
+//            val start = mEdit.selectionStart
+            //判定是否是中文的正则表达式 [\\u4e00-\\u9fa5]判断一个中文 [\\u4e00-\\u9fa5]+多个中文
+            val reg = "[\\u4e00-\\u9fa5]"
 
-        context.obtainStyledAttributes(attrs, R.styleable.PlateView, defStyle, 0).run {
+            if (primaryCode == -3) {
+//                if (editable != null && editable.isNotEmpty()) {
+//                    //没有输入内容时软键盘重置为省份简称软键盘
+//
+//                    if (start > 0) {
+//                        editable.delete(start - 1, start)
+//                    }
+//                }
+            }
+        }
+    }
+
+    init {
+        LayoutInflater.from(mContext).inflate(R.layout.layout_plate_view, this)
+
+        mContext.obtainStyledAttributes(attrs, R.styleable.PlateView, defStyle, 0).run {
 
             marginSize = getDimensionPixelSize(R.styleable.PlateView_marginSize, defaultMargin)
 
@@ -140,10 +171,11 @@ class PlateView @JvmOverloads constructor(
     }
 
     private fun showPlateInputView() {
-        mPlateInputView.showAtLocation(this, Gravity.BOTTOM, 0, 0)
+
+        //mPlateInputView.showAtLocation(this, Gravity.BOTTOM, 0, 0)
         when (currentIndex) {
-            0 -> mPlateInputView.showProvince()
-            else -> mPlateInputView.showPlateChar()
+            0 -> showProvinces()
+            else -> showNumberLetters()
         }
     }
 
@@ -197,16 +229,41 @@ class PlateView @JvmOverloads constructor(
 
     private fun initPlateInputView() {
 
-        mPlateInputView = PlateInputView(context) { word ->
+//        mPlateInputView = PlateInputView(mContext as Activity) { word ->
+//
+//            // 点击删除按钮
+//            if (isDeleteButton(word)) {
+//                plateCharBack(plateTextList[currentIndex])
+//                return@PlateInputView
+//            }
+//
+//            plateCharForward(plateTextList[currentIndex], word)
+//        }
 
-            // 点击删除按钮
-            if (isDeleteButton(word)) {
-                plateCharBack(plateTextList[currentIndex])
-                return@PlateInputView
-            }
-
-            plateCharForward(plateTextList[currentIndex], word)
+        mKvProvinces.run {
+            keyboard = Keyboard(mContext, R.xml.province_abbreviation)
+            isEnabled = true
+            //设置pop弹窗
+            isPreviewEnabled = true
+            setOnKeyboardActionListener(keyboardListener)
         }
+
+        mKvNumberLetters.run {
+            keyboard = Keyboard(mContext, R.xml.number_and_letters)
+            isEnabled = true
+            isPreviewEnabled = true
+             setOnKeyboardActionListener(keyboardListener)
+        }
+    }
+
+    fun showProvinces() {
+        mKvProvinces.visible()
+        mKvNumberLetters.gone()
+    }
+
+    fun showNumberLetters() {
+        mKvProvinces.gone()
+        mKvNumberLetters.visible()
     }
 
     private fun isDeleteButton(word: String): Boolean = word == PlateInputView.DELETE
@@ -214,7 +271,7 @@ class PlateView @JvmOverloads constructor(
     private fun plateCharForward(textView: TextView, content: String) {
 
         if (isFirstChar()) {
-            mPlateInputView.showPlateChar()
+//            mPlateInputView.showNumberLetters()
         }
 
         resetTextViewStyleAndText(textView, content)
@@ -232,7 +289,7 @@ class PlateView @JvmOverloads constructor(
 
     private fun plateCharBack(textView: TextView) {
         if (isSecondChar()) {
-            mPlateInputView.showProvince()
+//            mPlateInputView.showProvinces()
         }
 
         resetTextViewStyleAndText(textView, defText)
@@ -273,4 +330,6 @@ class PlateView @JvmOverloads constructor(
             plateManager.displayPlateBox()
         }
     }
+
+
 }

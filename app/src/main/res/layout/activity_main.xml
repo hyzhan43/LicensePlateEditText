@@ -5,25 +5,55 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:id="@+id/mLlContainer">
 
     <com.zhan.plate.PlateView
         android:id="@+id/mPlateView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        app:focusColor="@color/colorPrimary"/>
+        app:focusColor="@color/colorPrimary" />
 
     <TextView
         android:id="@+id/mTvHint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@drawable/shape_radius4_bg"
+        android:gravity="center"
         android:padding="10dp"
         android:text="@string/change_to_normal_plate"
-        android:gravity="center"
-        android:layout_margin="10dp"
         android:textColor="@android:color/black"
         android:textSize="14sp"
-        android:background="@drawable/shape_radius4_bg"
         android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/id_keyboard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_margin="20dp"
+        android:background="#ACE"
+        android:hint="车牌号 :"
+        android:padding="20dp"
+        android:text=""
+        android:textColor="#000"
+        android:textSize="20sp" />
+
+    <android.inputmethodservice.KeyboardView
+        android:id="@+id/mKvProvinces"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#DCDCDC"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:keyBackground="@drawable/btn_keyboard_key"
+        android:keyPreviewLayout="@layout/key_preview_layout"
+        android:keyTextColor="#747474"
+        android:keyTextSize="20sp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:shadowRadius="0.0"
+        android:visibility="gone" />
 </LinearLayout>
