@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
 
 # 更多用法
 
-## Attributes属性（banner布局文件中调用）
+## Attributes属性（plateView布局文件中调用）
 |Attributes     | Format     | Describe
 |---            | ---        | ---|
 focusColor      | color      | 设置选中输入框整体(字体+背景)颜色 默认Color.BLACK
