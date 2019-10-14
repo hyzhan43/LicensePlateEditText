@@ -11,7 +11,6 @@ import android.view.View
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.setMargins
-import com.zhan.ktwing.ext.dp2px
 import com.zhan.ktwing.ext.getDrawableRef
 import com.zhan.ktwing.ext.sp2px
 import com.zhan.plate.enums.BackgroundStyleEnum
@@ -55,6 +54,9 @@ class PlateView @JvmOverloads constructor(
     private val defaultMargin = 4
     private val marginSize: Int
 
+    private val defBorderWidth = 1
+    private val borderWidth: Int
+
     private val defTextNormalBg = getDrawableRef(R.drawable.shape_radius4_bg)
     private val defTextFocusBg = getDrawableRef(R.drawable.shape_radius4_bg)
 
@@ -87,6 +89,8 @@ class PlateView @JvmOverloads constructor(
 
             backgroundStyle =
                 getInt(R.styleable.PlateView_backgroundStyle, BackgroundStyleEnum.STROKE.code)
+
+            borderWidth = getDimensionPixelSize(R.styleable.PlateView_borderWidth, defBorderWidth)
 
             focusColor = getColor(R.styleable.PlateView_focusColor, Color.BLACK)
             normalColor = getColor(R.styleable.PlateView_normalColor, Color.BLACK)
@@ -131,8 +135,8 @@ class PlateView @JvmOverloads constructor(
 
     private fun initBackgroundStyle() {
         if (backgroundStyle == BackgroundStyleEnum.STROKE.code) {
-            (defTextNormalBg as GradientDrawable).setStroke(1, normalBgColor)
-            (defTextFocusBg as GradientDrawable).setStroke(1, focusBgColor)
+            (defTextNormalBg as GradientDrawable).setStroke(borderWidth, normalBgColor)
+            (defTextFocusBg as GradientDrawable).setStroke(borderWidth, focusBgColor)
         } else {
             (defTextNormalBg as GradientDrawable).setColor(normalBgColor)
             (defTextFocusBg as GradientDrawable).setColor(focusBgColor)
